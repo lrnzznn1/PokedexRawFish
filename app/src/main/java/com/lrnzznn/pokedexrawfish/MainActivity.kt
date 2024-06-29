@@ -34,8 +34,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-
 @Composable
 fun Main(modifier: Modifier = Modifier) {
     Box(
@@ -47,35 +45,10 @@ fun Main(modifier: Modifier = Modifier) {
                 .align(Alignment.Center)
                 .verticalScroll(rememberScrollState())
         ) {
-            for (i in 1..15) {
-                Pokemon(modifier = modifier, i = i)
-            }
+            PokemonInterface()
         }
     }
 }
-
-
-
-@Composable
-fun Pokemon(modifier: Modifier, i : Int){
-    Box(
-        modifier = Modifier
-            .padding(top = 40.dp, bottom = 40.dp)
-    ){
-        Column{
-            BasicText(
-                text = "prova $i",
-                modifier = modifier
-            )
-            BasicText(
-                text = "descrizione di $i",
-                modifier = modifier
-            )
-        }
-
-    }
-}
-
 
 @Preview(showBackground = true)
 @Composable
