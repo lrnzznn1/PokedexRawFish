@@ -2,7 +2,7 @@
 accompanistSwiperefresh = "0.28.0"
 agp = "8.3.2"
 foundation = "1.3.1"
-kotlin = "1.9.10"
+kotlin = "1.9.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -16,11 +16,12 @@ lifecycleRuntimeKtx = "2.8.1"
 activityCompose = "1.9.0"
 composeBom = "2023.08.00"
 material = "1.0.5"
-roomCompiler = "2.5.0"
-roomKtx = "2.5.0"
-roomRuntime = "2.5.0"
+roomCompiler = "2.6.0"
+roomKtx = "2.6.0"
+roomRuntime = "2.6.0"
 ui = "1.0.5"
 uiTooling = "1.0.5"
+mediationTestSuite = "3.0.0"
 
 [libraries]
 accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistSwiperefresh" }
@@ -50,6 +51,7 @@ ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", vers
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
+mediation-test-suite = { group = "com.google.android.ads", name = "mediation-test-suite", version.ref = "mediationTestSuite" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

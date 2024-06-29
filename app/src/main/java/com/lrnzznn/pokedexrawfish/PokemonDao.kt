@@ -17,4 +17,7 @@ interface PokemonDao{
 
     @Update
     suspend fun updatePokemon(pokemon: Pokemon)
+
+    @Query("DELETE FROM pokemon_table")
+    suspend fun deleteAllPokemon()
 }

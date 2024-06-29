@@ -13,6 +13,6 @@ data class Pokemon(
     val name: String,
     val height: Int,
     val weight: Int,
-    val types: MutableList<Int>,
+    val types: MutableList<String>,
     val images: MutableList<String>
 )
