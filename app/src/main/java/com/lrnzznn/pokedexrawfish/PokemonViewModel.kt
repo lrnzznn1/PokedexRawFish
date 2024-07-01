@@ -1,5 +1,8 @@
 package com.lrnzznn.pokedexrawfish
 
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -41,7 +44,6 @@ class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() 
 
     fun addTenRandomPokemon() {
         viewModelScope.launch {
-            deleteAllPokemon() // Prima di aggiungere, elimina tutti i Pokémon attuali
             repeat(10) {
                 val randomName = "Pokemon ${it + 1}"
                 val pokemon = Pokemon(
@@ -50,10 +52,11 @@ class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() 
                     name = randomName,
                     height = 10,
                     weight = 10,
-                    types = mutableListOf("a","b") ,
-                    images = mutableListOf("Image1","Image2")
+                    types = mutableListOf("a", "b"),
+                    images = mutableListOf("Image1", "Image2")
                 )
                 repository.insertPokemon(pokemon)
+                Log.d("PokemonInsert", "Inserted Pokémon $randomName")
             }
         }
     }

@@ -18,4 +18,5 @@ class PokemonRepository(private val pokemonDao: PokemonDao) {
     suspend fun deleteAllPokemon(){
         return pokemonDao.deleteAllPokemon()
     }
+
 }

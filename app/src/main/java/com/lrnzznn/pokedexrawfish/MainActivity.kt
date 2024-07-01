@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.lrnzznn.pokedexrawfish.ui.theme.PokedexRawFishTheme
 
 
+// TODO: vediamo che fare
 
 
 class MainActivity : ComponentActivity() {
@@ -29,10 +30,9 @@ class MainActivity : ComponentActivity() {
         val database = PokemonDatabase.getDatabase(applicationContext)
         val repository = PokemonRepository(database.pokemonDao())
 
-        viewModel = ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-        )[PokemonViewModel::class.java]
+        val viewModelFactory = PokemonViewModelFactory(repository)
+        viewModel = ViewModelProvider(this, viewModelFactory)[PokemonViewModel::class.java]
+
 
 
         setContent {
@@ -55,12 +55,6 @@ fun Main(viewModel: PokemonViewModel, modifier: Modifier = Modifier) {
         modifier = Modifier
             .fillMaxSize()
     ) {
-        Column(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .verticalScroll(rememberScrollState())
-        ) {
-            PokemonInterface(viewModel = viewModel)
-        }
+        PokemonInterface(viewModel = viewModel)
     }
 }

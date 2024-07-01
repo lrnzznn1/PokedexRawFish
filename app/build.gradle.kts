@@ -60,7 +60,9 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.mediation.test.suite)
+    implementation("com.google.android.ads:mediation-test-suite:3.0.0") {
+        exclude(group = "com.google.android.gms", module = "play-services-ads")
+    }
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -81,5 +83,9 @@ dependencies {
 
     implementation(libs.androidx.room.runtime)
     implementation(libs.room.ktx)
+    //noinspection KaptUsageInsteadOfKsp
     kapt(libs.androidx.room.compiler)
+
+    implementation(libs.accompanist.swiperefresh)
+
 }
