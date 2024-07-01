@@ -34,6 +34,13 @@ suspend fun fetchPokemons(): List<PokemonJSON> {
     }
 }
 
-suspend fun fetchPokemonDetails(){
-
+suspend fun fetchPokemonDetails(urldetail:String): Pokemon{
+    var pokemon : Pokemon
+    try{
+        val response: HttpResponse = client.get(urldetail)
+        val jsonString = response.readText()
+        Log.d("HTTP6", jsonString)
+    }catch (e: Exception){
+        Log.e("fetchPokemonDetails", "Error fetching pokemon details", e)
+    }
 }
