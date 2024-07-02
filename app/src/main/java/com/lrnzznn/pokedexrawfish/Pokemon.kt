@@ -1,6 +1,5 @@
 package com.lrnzznn.pokedexrawfish
 
-import androidx.compose.ui.text.font.FontWeight
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable

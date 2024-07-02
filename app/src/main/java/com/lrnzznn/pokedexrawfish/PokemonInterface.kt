@@ -2,52 +2,25 @@ package com.lrnzznn.pokedexrawfish
 
 import android.util.Log
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.Button
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
-import kotlinx.coroutines.launch
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.collectAsState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 
 @Composable
 fun PokemonInterface(viewModel: PokemonViewModel) {
-    val scope = rememberCoroutineScope()
-    var name by remember {
-        mutableStateOf(TextFieldValue("")) // Stato per il nome del Pokemon
-    }
-
-    // Ottieni lo stato attuale della lista dei Pokémon dal ViewModel
-    val pokemonListState by viewModel.pokemonList.collectAsState()
-
-    // Stato per gestire il numero di Pokémon mostrati
-    var numberOfPokemonsToShow by remember { mutableStateOf(20) }
-
-
-    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
 
     LaunchedEffect(Unit) {
         try {
@@ -84,6 +57,7 @@ fun PokemonInterface(viewModel: PokemonViewModel) {
 
 
 
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
 
 
     // Ottieni LazyPagingItems per gestire la lista paginata dei Pokémon
@@ -120,9 +94,11 @@ fun PokemonItem(pokemon: Pokemon) {
             .background(color = Color.LightGray)
     ) {
         Text(text = "ID:  ${pokemon.id}")
+        /*
         Text(text = "Nome: ${pokemon.name}")
         Text(text = "Altezza: ${pokemon.height}")
         Text(text = "Peso: ${pokemon.weight}")
         Text(text = "Tipi: ${pokemon.types.joinToString(", ")}")
+        */
     }
 }
