@@ -1,5 +1,6 @@
 package com.lrnzznn.pokedexrawfish
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -22,4 +23,7 @@ interface PokemonDao{
 
     @Query("DELETE FROM pokemon_table")
     suspend fun deleteAllPokemon()
+
+    @Query("SELECT * FROM pokemon_table")
+    fun getAllPokemonPagingSource(): PagingSource<Int, Pokemon>
 }

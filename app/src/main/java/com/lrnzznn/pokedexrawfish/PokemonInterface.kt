@@ -26,6 +26,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.collectAsState
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -33,15 +35,19 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun PokemonInterface(viewModel: PokemonViewModel) {
-    /*
-    var data by remember {
-        mutableStateOf("Loading...") // Stato di caricamento iniziale
-    }
-    */
     val scope = rememberCoroutineScope()
     var name by remember {
         mutableStateOf(TextFieldValue("")) // Stato per il nome del Pokemon
     }
+
+    // Ottieni lo stato attuale della lista dei Pokémon dal ViewModel
+    val pokemonListState by viewModel.pokemonList.collectAsState()
+
+    // Stato per gestire il numero di Pokémon mostrati
+    var numberOfPokemonsToShow by remember { mutableStateOf(20) }
+
+
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
 
     LaunchedEffect(Unit) {
         try {
@@ -77,18 +83,15 @@ fun PokemonInterface(viewModel: PokemonViewModel) {
     }
 
 
-    // Ottieni lo stato attuale della lista dei Pokémon dal ViewModel
-    val pokemonListState by viewModel.pokemonList.collectAsState()
 
-    // Stato per gestire il numero di Pokémon mostrati
-    var numberOfPokemonsToShow by remember { mutableStateOf(20) }
 
-    // Funzione per aggiungere più Pokémon alla lista
-    fun showMorePokemons() {
-        numberOfPokemonsToShow += 20 // Aggiungi 20 Pokémon ogni volta che viene premuto il pulsante
-    }
+
+    // Ottieni LazyPagingItems per gestire la lista paginata dei Pokémon
+    val lazyPagingItems = viewModel.pokemonPagingFlow.collectAsLazyPagingItems()
+
+
     SwipeRefresh(
-        state = rememberSwipeRefreshState(isRefreshing = false),
+        state = swipeRefreshState,
         onRefresh = {
             viewModel.deleteAllPokemon()
         }
@@ -98,21 +101,8 @@ fun PokemonInterface(viewModel: PokemonViewModel) {
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            items(pokemonListState.take(numberOfPokemonsToShow)) { pokemon ->
-                PokemonItem(pokemon = pokemon)
-            }
-            // Pulsante "Mostra altro" per caricare più Pokémon
-            if (numberOfPokemonsToShow < pokemonListState.size) {
-                item {
-                    Button(
-                        onClick = { showMorePokemons() },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp)
-                    ) {
-                        Text(text = "Mostra altro")
-                    }
-                }
+            items(lazyPagingItems) { pokemon ->
+                pokemon?.let { PokemonItem(pokemon = it) }
             }
         }
     }
@@ -122,12 +112,14 @@ fun PokemonInterface(viewModel: PokemonViewModel) {
 
 @Composable
 fun PokemonItem(pokemon: Pokemon) {
+    Log.d("PokemonStamp",pokemon.id.toString())
     Column(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
             .background(color = Color.LightGray)
     ) {
+        Text(text = "ID:  ${pokemon.id}")
         Text(text = "Nome: ${pokemon.name}")
         Text(text = "Altezza: ${pokemon.height}")
         Text(text = "Peso: ${pokemon.weight}")

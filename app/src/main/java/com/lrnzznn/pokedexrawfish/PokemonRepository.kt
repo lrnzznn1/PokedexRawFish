@@ -1,5 +1,6 @@
 package com.lrnzznn.pokedexrawfish
 
+import androidx.paging.PagingSource
 import kotlinx.coroutines.flow.Flow
 
 class PokemonRepository(private val pokemonDao: PokemonDao) {
@@ -17,6 +18,10 @@ class PokemonRepository(private val pokemonDao: PokemonDao) {
     }
     suspend fun deleteAllPokemon(){
         return pokemonDao.deleteAllPokemon()
+    }
+
+    fun getAllPokemonPaged(): PagingSource<Int, Pokemon> {
+        return pokemonDao.getAllPokemonPagingSource()
     }
 
 }
