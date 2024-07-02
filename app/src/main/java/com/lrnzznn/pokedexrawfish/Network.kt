@@ -34,7 +34,7 @@ suspend fun fetchPokemons(): List<PokemonJSON> {
     }
 }
 
-suspend fun fetchPokemonDetails(urldetail:String): Pokemon{
+suspend fun fetchPokemonDetails(urldetail:String){
     var pokemon : Pokemon
     try{
         val response: HttpResponse = client.get(urldetail)
