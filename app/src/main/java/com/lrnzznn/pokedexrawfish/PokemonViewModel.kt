@@ -1,28 +1,19 @@
 package com.lrnzznn.pokedexrawfish
 
-import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 
 
 class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() {
-    private val _pokemonList = MutableStateFlow<List<Pokemon>>(emptyList())
+    private val _pokemonList = MutableLiveData<List<Pokemon>>()
+    val pokemonList: LiveData<List<Pokemon>> = _pokemonList
 
     init {
         getAllPokemon()
     }
-
-    val pokemonPagingFlow: Flow<PagingData<Pokemon>> = Pager(PagingConfig(pageSize = 10)) {
-        repository.getAllPokemonPaged()
-    }.flow.cachedIn(viewModelScope)
-
 
     private fun getAllPokemon() {
         viewModelScope.launch {

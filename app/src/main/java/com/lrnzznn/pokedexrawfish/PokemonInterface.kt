@@ -1,7 +1,8 @@
+@file:Suppress("DEPRECATION")
+
 package com.lrnzznn.pokedexrawfish
 
 import android.util.Log
-import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.background
@@ -12,15 +13,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.LaunchedEffect
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 
 @Composable
 fun PokemonInterface(viewModel: PokemonViewModel) {
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
 
     LaunchedEffect(Unit) {
         try {
@@ -30,8 +33,7 @@ fun PokemonInterface(viewModel: PokemonViewModel) {
                 Log.d("HTTP3", data[0].name)
                 // Puoi lavorare con i dati ottenuti qui
                 Log.d("HTTP4", data.size.toString())
-                var contatore: Int = 0
-                for (pokemon in data) {
+                for ((contatore, pokemon) in data.withIndex()) {
                     viewModel.addPokemon(
                         Pokemon(
                             id = contatore,
@@ -43,7 +45,6 @@ fun PokemonInterface(viewModel: PokemonViewModel) {
                             images = mutableListOf("a", "b")
                         )
                     )
-                    contatore++
                 }
                 Log.d("HTTP5", "Fino di Aggiungere")
             } else {
@@ -55,14 +56,9 @@ fun PokemonInterface(viewModel: PokemonViewModel) {
         }
     }
 
+    val pokemonList by viewModel.pokemonList.observeAsState(emptyList())
 
-
-    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
-
-
-    // Ottieni LazyPagingItems per gestire la lista paginata dei Pokémon
-    val lazyPagingItems = viewModel.pokemonPagingFlow.collectAsLazyPagingItems()
-
+    Log.d("Test1" , "!!!!")
 
     SwipeRefresh(
         state = swipeRefreshState,
@@ -70,13 +66,14 @@ fun PokemonInterface(viewModel: PokemonViewModel) {
             viewModel.deleteAllPokemon()
         }
     ) {
+        Log.d("Test2" , "!!!!")
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            items(lazyPagingItems) { pokemon ->
-                pokemon?.let { PokemonItem(pokemon = it) }
+            items(pokemonList) { pokemon ->
+                PokemonItem(pokemon = pokemon)
             }
         }
     }
@@ -94,11 +91,9 @@ fun PokemonItem(pokemon: Pokemon) {
             .background(color = Color.LightGray)
     ) {
         Text(text = "ID:  ${pokemon.id}")
-        /*
         Text(text = "Nome: ${pokemon.name}")
         Text(text = "Altezza: ${pokemon.height}")
         Text(text = "Peso: ${pokemon.weight}")
         Text(text = "Tipi: ${pokemon.types.joinToString(", ")}")
-        */
     }
 }

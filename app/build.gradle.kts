@@ -63,6 +63,7 @@ dependencies {
     implementation("com.google.android.ads:mediation-test-suite:3.0.0") {
         exclude(group = "com.google.android.gms", module = "play-services-ads")
     }
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -92,6 +93,4 @@ dependencies {
     implementation(libs.androidx.paging.compose)
 
     implementation(libs.androidx.room.paging)
-
-
 }

@@ -9,6 +9,8 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
+
+
 val client = HttpClient(CIO) {
     install(JsonFeature) {
         serializer = KotlinxSerializer()
@@ -17,7 +19,7 @@ val client = HttpClient(CIO) {
 
 suspend fun fetchPokemons(): List<PokemonJSON> {
     try {
-        val response: HttpResponse = client.get("https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0")
+        val response: HttpResponse = client.get("https://pokeapi.co/api/v2/pokemon?limit=300&offset=0")
         val jsonString = response.readText()
         Log.d("HTTP1", jsonString)
 

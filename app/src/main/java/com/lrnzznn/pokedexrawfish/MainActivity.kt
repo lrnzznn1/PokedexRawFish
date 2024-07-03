@@ -42,6 +42,6 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Main(viewModel: PokemonViewModel, modifier: Modifier = Modifier) {
+fun Main(viewModel: PokemonViewModel) {
     PokemonInterface(viewModel = viewModel)
 }

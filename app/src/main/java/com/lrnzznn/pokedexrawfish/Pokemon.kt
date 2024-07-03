@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 
+@Suppress("PLUGIN_IS_NOT_ENABLED")
 @Serializable
 @Entity(tableName = "pokemon_table")
 data class Pokemon(
