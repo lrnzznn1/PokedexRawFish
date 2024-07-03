@@ -93,4 +93,7 @@ dependencies {
     implementation(libs.androidx.paging.compose)
 
     implementation(libs.androidx.room.paging)
+
+    implementation("androidx.compose.runtime:runtime-livedata:1.1.0")
+
 }

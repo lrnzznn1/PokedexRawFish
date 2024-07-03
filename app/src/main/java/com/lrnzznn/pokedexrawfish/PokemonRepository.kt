@@ -1,7 +1,9 @@
 package com.lrnzznn.pokedexrawfish
 
 import androidx.paging.PagingSource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 class PokemonRepository(private val pokemonDao: PokemonDao) {
 
@@ -20,8 +22,9 @@ class PokemonRepository(private val pokemonDao: PokemonDao) {
         return pokemonDao.deleteAllPokemon()
     }
 
-    fun getAllPokemonPaged(): PagingSource<Int, Pokemon> {
-        return pokemonDao.getAllPokemonPagingSource()
+    suspend fun getPokemonInRange(offset: Int, limit: Int): List<Pokemon> {
+        return withContext(Dispatchers.IO) {
+            pokemonDao.getPokemonInRange(offset, limit)
+        }
     }
-
 }

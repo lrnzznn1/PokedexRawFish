@@ -24,4 +24,7 @@ interface PokemonDao{
 
     @Query("SELECT * FROM pokemon_table")
     fun getAllPokemonPagingSource(): PagingSource<Int, Pokemon>
+
+    @Query("SELECT * FROM pokemon_table LIMIT :limit OFFSET :offset")
+    suspend fun getPokemonInRange(offset: Int, limit: Int): List<Pokemon>
 }

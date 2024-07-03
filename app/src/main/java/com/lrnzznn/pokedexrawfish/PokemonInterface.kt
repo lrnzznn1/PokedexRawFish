@@ -13,17 +13,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.setValue
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.LiveData
+
+
 
 
 @Composable
 fun PokemonInterface(viewModel: PokemonViewModel) {
-    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
 
     LaunchedEffect(Unit) {
         try {
@@ -56,25 +61,52 @@ fun PokemonInterface(viewModel: PokemonViewModel) {
         }
     }
 
-    val pokemonList by viewModel.pokemonList.observeAsState(emptyList())
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
+    // State per il PokemonList da mostrare
+    val pokemonListState by viewModel.pokemonListState.observeAsState(emptyList())
 
-    Log.d("Test1" , "!!!!")
 
+    // Effetto di lancio per inizializzare i dati all'avvio
+    LaunchedEffect(Unit) {
+        viewModel.loadMorePokemons(0, 40)
+    }
+
+    // Composable principale
     SwipeRefresh(
         state = swipeRefreshState,
         onRefresh = {
-            viewModel.deleteAllPokemon()
+            //viewModel.loadMorePokemons(0, 40) // Ricarica i primi 40 Pokémon
         }
     ) {
-        Log.d("Test2" , "!!!!")
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            items(pokemonList) { pokemon ->
+            items(pokemonListState) { pokemon ->
                 PokemonItem(pokemon = pokemon)
             }
+        }
+    }
+
+    // Pulsanti per la paginazione
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Button(
+            onClick = { viewModel.loadPreviousPage() },
+            enabled = viewModel.currentPage > 0
+        ) {
+            Text("Pagina precedente")
+        }
+
+        Button(
+            onClick = { viewModel.loadNextPage() }
+        ) {
+            Text("Pagina successiva")
         }
     }
 }
