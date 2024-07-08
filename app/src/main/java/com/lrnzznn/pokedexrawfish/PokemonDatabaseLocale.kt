@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
 
-@Database(entities = [Pokemon::class], version = 1, exportSchema = false)
+@Database(entities = [Pokemon::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class PokemonDatabase : RoomDatabase() {
     abstract fun pokemonDao(): PokemonDao
@@ -22,7 +22,9 @@ abstract class PokemonDatabase : RoomDatabase() {
                     context.applicationContext,
                     PokemonDatabase::class.java,
                     "pokemon_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }

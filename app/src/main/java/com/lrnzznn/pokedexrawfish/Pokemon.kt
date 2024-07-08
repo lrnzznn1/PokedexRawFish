@@ -14,5 +14,5 @@ data class Pokemon(
     val height: Int,
     val weight: Int,
     val images: String,
-    val movesList: movesList
+    val movesList: List<Move>
 )

@@ -43,20 +43,27 @@ fun PokemonInterface(viewModel: PokemonViewModel) {
                 viewModel.deleteAllPokemon()
                 val data = fetchPokemons()
                 if (data.isNotEmpty()) {
-                    Log.d("HTTP3", data[0].name)
                     for ((contatore, pokemon) in data.withIndex()) {
-                        val pokemondata = fetchPokemonDetails(pokemon.url)
-                        viewModel.addPokemon(
-                            Pokemon(
-                                id = contatore,
-                                url = pokemon.url,
-                                name = pokemon.name,
-                                height = pokemondata.height,
-                                weight = pokemondata.weight,
-                                images = pokemondata.imageUrl,
-                                movesList = pokemondata.movesList
+                        val pokemonDetail = fetchPokemonDetails(contatore,pokemon.url)
+                        if (pokemonDetail != null) {
+                            // Mappa le mosse dell'API in oggetti Move
+                            val moves = pokemonDetail.moves.map { Move(MoveName(it.move.name)) }
+
+                            viewModel.addPokemon(
+                                Pokemon(
+                                    id = contatore,
+                                    url = pokemon.url,
+                                    name = pokemon.name,
+                                    height = pokemonDetail.height,
+                                    weight = pokemonDetail.weight,
+                                    images = pokemonDetail.sprites.front_default ?: "",
+                                    movesList = moves // Assegna la lista di oggetti Move
+                                )
                             )
-                        )
+                        } else {
+                            Log.e("fetchPokemonDetails", "Failed to fetch details for ${pokemon.name}")
+                            // Gestisci il fallimento nel fetch dei dettagli come preferisci
+                        }
                     }
                 } else {
                     Log.d("HTTP5", "Nessun dato disponibile")
@@ -133,7 +140,7 @@ fun PokemonItem(pokemon: Pokemon) {
         Text(text = "Nome: ${pokemon.name}")
         Text(text = "Altezza: ${pokemon.height*0.1.toFloat()} m")
         Text(text = "Peso: ${pokemon.weight*0.1.toFloat()} kg" )
-        Text(text = "Peso: ${pokemon.images}" )
-        Text(text = "Peso: ${pokemon.movesList}" )
+        Text(text = "Immagine: ${pokemon.images}" )
+        Text(text = "Mosse: ${pokemon.movesList}" )
     }
 }

@@ -9,6 +9,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
+import kotlinx.serialization.json.Json
 
 
 val client = HttpClient(CIO) {
@@ -36,21 +37,21 @@ suspend fun fetchPokemons(): List<PokemonJSON> {
     }
 }
 
-suspend fun fetchPokemonDetails(urldetail : String) : PokemonDetail{
-    try{
-        Log.d("fetchPokemonDetails", urldetail)
+private val json = Json {
+    ignoreUnknownKeys = true // Ignora le chiavi sconosciute nel JSON
+}
+
+suspend fun fetchPokemonDetails(contatore:Int,urldetail : String) : PokemonDetail?{
+    return try {
         val response: HttpResponse = client.get(urldetail)
         val jsonString = response.readText()
-        Log.d("fetchPokemonDetails", jsonString)
+        Log.d("JSON response","$contatore $jsonString")
 
-        val pokemonDetail = Gson().fromJson<PokemonDetail>(jsonString, object :
-            TypeToken<PokemonDetail>() {}.type)
+        val pokemonDetail = json.decodeFromString<PokemonDetail>(jsonString)
 
-        Log.d("fetchPokemonDetails", pokemonDetail.toString())
-
-        return pokemonDetail
+        pokemonDetail
     }catch (e: Exception){
         Log.e("aaa", "Error fetching pokemon details", e)
-        return PokemonDetail(null,null,null,null)
+        null
     }
 }

@@ -1,5 +1,9 @@
 package com.lrnzznn.pokedexrawfish
 
+import io.ktor.client.request.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+
 class PokemonJSON {
     val name: String = ""
     val url: String = ""
@@ -9,12 +13,26 @@ data class PokemonListResponse(
     val results: List<PokemonJSON>
 )
 
-class PokemonDetail(
-    val height: Int?,
-    val weight: Int?,
-    val imageUrl: String?,
-    val movesList: List<Move>?
+@Serializable
+data class PokemonDetail(
+    val height: Int,
+    val weight: Int,
+    val sprites: Sprites,
+    val moves: List<Move>
 )
-class Move(
+
+@Serializable
+data class Sprites(
+    val front_default: String?
+    // Altre immagini o sprite se necessario
+)
+
+@Serializable
+data class Move(
+    val move: MoveName
+)
+
+@Serializable
+data class MoveName(
     val name: String
 )
