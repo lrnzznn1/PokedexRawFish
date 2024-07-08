@@ -2,16 +2,18 @@ package com.lrnzznn.pokedexrawfish
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.State
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 
 class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() {
+
+    private val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     var currentPage = 0
     private val pageSize = 20
@@ -19,18 +21,22 @@ class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() 
     private val _pokemonListState = mutableStateOf<List<Pokemon>>(emptyList())
     val pokemonListState: State<List<Pokemon>> = _pokemonListState
 
+
+
     init {
         viewModelScope.launch {
             loadMorePokemons(0, pageSize)
         }
     }
 
-    suspend fun loadMorePokemons(offset: Int, limit: Int) {
-        try {
-            val pokemons = repository.getPokemonInRange(offset, limit)
-            _pokemonListState.value = pokemons // Sovrascrive la lista corrente
-        } catch (e: Exception) {
-            Log.e("PokemonViewModel", "Error loading Pokémon", e)
+    fun loadMorePokemons(offset: Int, limit: Int) {
+        viewModelScope.launch {
+            try {
+                val pokemons = repository.getPokemonInRange(offset, limit)
+                _pokemonListState.value = pokemons // Sovrascrive la lista corrente
+            } catch (e: Exception) {
+                Log.e("PokemonViewModel", "Error loading Pokémon", e)
+            }
         }
     }
 
@@ -69,12 +75,19 @@ class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() 
     fun addPokemon(pokemon: Pokemon) {
         viewModelScope.launch {
             repository.insertPokemon(pokemon)
+            refreshPokemonList() // Dopo l'inserimento, aggiorna la lista
         }
     }
 
     fun deleteAllPokemon() {
         viewModelScope.launch {
             repository.deleteAllPokemon()
+            refreshPokemonList() // Dopo l'inserimento, aggiorna la lista
         }
+    }
+    private suspend fun refreshPokemonList() {
+        val offset = currentPage * pageSize
+        val pokemons = repository.getPokemonInRange(offset, pageSize)
+        _pokemonListState.value = pokemons
     }
 }

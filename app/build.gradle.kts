@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     kotlin("kapt") version "1.9.0"
     kotlin("plugin.serialization") version "1.5.0"
-
 }
 
 android {
@@ -97,5 +96,8 @@ dependencies {
     implementation(libs.androidx.room.paging)
 
     implementation("androidx.compose.runtime:runtime-livedata:1.1.0")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1") // O la versione più recente
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1") // O la versione più recente
 
 }

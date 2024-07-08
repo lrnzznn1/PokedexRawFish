@@ -43,5 +43,5 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Main(viewModel: PokemonViewModel) {
-    PokemonInterface(viewModel = viewModel)
+    PokemonInterface(viewModel = viewModel,)
 }

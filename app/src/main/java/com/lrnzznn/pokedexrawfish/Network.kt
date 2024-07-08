@@ -20,7 +20,7 @@ val client = HttpClient(CIO) {
 
 suspend fun fetchPokemons(): List<PokemonJSON> {
     try {
-        val response: HttpResponse = client.get("https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0")
+        val response: HttpResponse = client.get("https://pokeapi.co/api/v2/pokemon?limit=10&offset=0")
         val jsonString = response.readText()
         Log.d("HTTP1", jsonString)
 
@@ -41,14 +41,15 @@ private val json = Json {
     ignoreUnknownKeys = true // Ignora le chiavi sconosciute nel JSON
 }
 
-suspend fun fetchPokemonDetails(contatore:Int,urldetail : String) : PokemonDetail?{
+suspend fun fetchPokemonDetails(urldetail : String) : PokemonDetail?{
     return try {
+        Log.d("time","1 $urldetail")
         val response: HttpResponse = client.get(urldetail)
         val jsonString = response.readText()
-        Log.d("JSON response","$contatore $jsonString")
+        Log.d("time","2 $jsonString")
+        //Log.d("JSON response", jsonString)
 
         val pokemonDetail = json.decodeFromString<PokemonDetail>(jsonString)
-
         pokemonDetail
     }catch (e: Exception){
         Log.e("aaa", "Error fetching pokemon details", e)

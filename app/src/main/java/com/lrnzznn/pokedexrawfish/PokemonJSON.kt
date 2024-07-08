@@ -1,10 +1,9 @@
 package com.lrnzznn.pokedexrawfish
 
-import io.ktor.client.request.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 
 class PokemonJSON {
+    val id: Int = 0
     val name: String = ""
     val url: String = ""
 }

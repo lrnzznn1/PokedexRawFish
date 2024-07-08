@@ -14,28 +14,27 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Button
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.setValue
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.sync.Semaphore
 
 @Composable
 fun PokemonInterface(viewModel: PokemonViewModel) {
 
     var isFirstLaunch by remember { mutableStateOf(true) }
+    viewModel.deleteAllPokemon()
 
     if (isFirstLaunch) {
         LaunchedEffect(Unit) {
@@ -43,38 +42,58 @@ fun PokemonInterface(viewModel: PokemonViewModel) {
                 viewModel.deleteAllPokemon()
                 val data = fetchPokemons()
                 if (data.isNotEmpty()) {
-                    for ((contatore, pokemon) in data.withIndex()) {
-                        val pokemonDetail = fetchPokemonDetails(contatore,pokemon.url)
-                        if (pokemonDetail != null) {
-                            // Mappa le mosse dell'API in oggetti Move
-                            val moves = pokemonDetail.moves.map { Move(MoveName(it.move.name)) }
+                    val concurrencyLimit = 25
+                    val semaphore = Semaphore(concurrencyLimit)
+                    coroutineScope {
+                        data.forEach { pokemon ->
+                            launch {
+                                try{
+                                    semaphore.acquire() // Acquisisce un permesso
 
-                            viewModel.addPokemon(
-                                Pokemon(
-                                    id = contatore,
-                                    url = pokemon.url,
-                                    name = pokemon.name,
-                                    height = pokemonDetail.height,
-                                    weight = pokemonDetail.weight,
-                                    images = pokemonDetail.sprites.front_default ?: "",
-                                    movesList = moves // Assegna la lista di oggetti Move
-                                )
-                            )
-                        } else {
-                            Log.e("fetchPokemonDetails", "Failed to fetch details for ${pokemon.name}")
-                            // Gestisci il fallimento nel fetch dei dettagli come preferisci
+                                    val pokemonDetail = fetchPokemonDetails(pokemon.url)
+                                    if (pokemonDetail != null) {
+                                        // Mappa le mosse dell'API in oggetti Move
+                                        val moves =
+                                            pokemonDetail.moves.map { Move(MoveName(it.move.name)) }
+
+                                        // Costruisci il Pokémon con i dettagli ottenuti
+                                        val newPokemon = Pokemon(
+                                            url = pokemon.url,
+                                            name = pokemon.name,
+                                            height = pokemonDetail.height,
+                                            weight = pokemonDetail.weight,
+                                            images = pokemonDetail.sprites.front_default ?: "",
+                                            movesList = moves
+                                        )
+                                        Log.d("ssss",newPokemon.toString())
+                                        viewModel.addPokemon(newPokemon)
+                                        //Log.d("ssss", viewModel.pokemonListState.value.toString())
+                                    } else {
+                                        Log.e(
+                                            "fetchPokemonDetails",
+                                            "Failed to fetch details for ${pokemon.name}"
+                                        )
+                                        // Gestisci il fallimento nel fetch dei dettagli come preferisci
+                                    }
+                                }
+                                finally {
+                                    semaphore.release() // Rilascia il permesso
+                                }
+                            }
                         }
                     }
                 } else {
                     Log.d("HTTP5", "Nessun dato disponibile")
                 }
             } catch (e: Exception) {
-                Log.e("LaunchedEffect", "Error fetching pokemons", e)
+                Log.e("LaunchedEffect", "Error fetching and adding pokemons", e)
             } finally {
                 isFirstLaunch = false
             }
         }
+        Log.d("End","End")
     }
+    Log.d("aaa","2")
 
 
 
@@ -118,7 +137,6 @@ fun PokemonInterface(viewModel: PokemonViewModel) {
                 items(pokemonListState) { pokemon ->
                     PokemonItem(pokemon = pokemon)
                     Log.d("listState", pokemonListState.size.toString())
-                    Log.d("Enable", viewModel.currentPage.toString())
                 }
             }
         }
