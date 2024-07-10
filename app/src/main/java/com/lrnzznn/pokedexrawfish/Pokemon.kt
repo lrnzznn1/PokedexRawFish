@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @Entity(tableName = "pokemon_table")
 data class Pokemon(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey val id: Int = 0,
     val url: String,
     val name: String,
     val height: Int,

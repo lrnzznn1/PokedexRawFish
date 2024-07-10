@@ -97,7 +97,13 @@ dependencies {
 
     implementation("androidx.compose.runtime:runtime-livedata:1.1.0")
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1") // O la versione più recente
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1") // O la versione più recente
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.3.1")
+
+    implementation(libs.coil.compose)
+
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+
+
 
 }

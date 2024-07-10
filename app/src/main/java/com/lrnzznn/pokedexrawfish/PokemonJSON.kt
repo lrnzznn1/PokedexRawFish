@@ -3,7 +3,6 @@ package com.lrnzznn.pokedexrawfish
 import kotlinx.serialization.Serializable
 
 class PokemonJSON {
-    val id: Int = 0
     val name: String = ""
     val url: String = ""
 }
@@ -14,6 +13,7 @@ data class PokemonListResponse(
 
 @Serializable
 data class PokemonDetail(
+    val id: Int,
     val height: Int,
     val weight: Int,
     val sprites: Sprites,

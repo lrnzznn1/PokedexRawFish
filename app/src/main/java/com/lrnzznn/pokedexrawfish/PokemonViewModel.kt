@@ -90,4 +90,8 @@ class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() 
         val pokemons = repository.getPokemonInRange(offset, pageSize)
         _pokemonListState.value = pokemons
     }
+
+    fun getPokemonById(id: Int?): Pokemon? {
+        return pokemonListState.value.find { it.id == id }
+    }
 }
