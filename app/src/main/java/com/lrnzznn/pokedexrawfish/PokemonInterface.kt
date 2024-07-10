@@ -23,20 +23,12 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import coil.compose.AsyncImage
-import com.google.android.ads.mediationtestsuite.MediationTestSuite.launch
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,15 +36,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.layout.ContentScale
-
 
 
 @Composable
@@ -61,7 +49,7 @@ fun PokemonInterface(viewModel: PokemonViewModel) {
     var isFirstLaunch by remember { mutableStateOf(true) }
 
     if (isFirstLaunch) {
-        LaunchedEffect(Unit) {
+        LaunchedEffect("load") {
             try {
                 loadPokemon(viewModel)
             } catch (e: Exception) {
@@ -112,11 +100,7 @@ fun PokemonListScreen(viewModel: PokemonViewModel, onItemClick: (Pokemon) -> Uni
         SwipeRefresh(
             state = swipeRefreshState,
             onRefresh = {
-                try {
-                    loadPokemon(viewModel)
-                } catch (e: Exception) {
-                    Log.e("onRefresh", "Error fetching and adding pokemons", e)
-                }
+
             }
         ) {
             LazyColumn(

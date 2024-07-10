@@ -105,3 +105,4 @@ fun loadPokemon(viewModel: PokemonViewModel){
         }
     }
 }
+

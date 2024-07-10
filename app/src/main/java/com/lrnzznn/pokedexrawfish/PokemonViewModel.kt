@@ -7,9 +7,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.State
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
 
 class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() {
 
@@ -20,7 +18,6 @@ class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() 
 
     private val _pokemonListState = mutableStateOf<List<Pokemon>>(emptyList())
     val pokemonListState: State<List<Pokemon>> = _pokemonListState
-
 
 
     init {
