@@ -34,14 +34,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Main(viewModel = viewModel)
+                    PokemonInterface(viewModel = viewModel)
                 }
             }
         }
     }
-}
-
-@Composable
-fun Main(viewModel: PokemonViewModel) {
-    PokemonInterface(viewModel = viewModel,)
 }

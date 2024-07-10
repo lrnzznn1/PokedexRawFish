@@ -33,7 +33,7 @@ class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() 
         viewModelScope.launch {
             try {
                 val pokemons = repository.getPokemonInRange(offset, limit)
-                _pokemonListState.value = pokemons // Sovrascrive la lista corrente
+                _pokemonListState.value = pokemons
             } catch (e: Exception) {
                 Log.e("PokemonViewModel", "Error loading Pokémon", e)
             }
@@ -42,13 +42,14 @@ class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() 
 
     fun loadNextPage() {
         viewModelScope.launch {
+            Log.d("test1314","next")
             try {
                 currentPage++
                 val offset = currentPage * pageSize
                 val limit = pageSize
                 val data = repository.getPokemonInRange(offset, limit)
                 if (data.isNotEmpty()) {
-                    _pokemonListState.value = data // Sovrascrive la lista corrente
+                    _pokemonListState.value = data
                 }
             } catch (e: Exception) {
                 Log.e("PokemonViewModel", "Error loading next page", e)
@@ -58,13 +59,14 @@ class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() 
 
     fun loadPreviousPage() {
         viewModelScope.launch {
+            Log.d("test1314","previus")
             try {
                 if (currentPage > 0) {
                     currentPage--
                     val offset = currentPage * pageSize
                     val limit = pageSize
                     val data = repository.getPokemonInRange(offset, limit)
-                    _pokemonListState.value = data // Sovrascrive la lista corrente
+                    _pokemonListState.value = data
                 }
             } catch (e: Exception) {
                 Log.e("PokemonViewModel", "Error loading previous page", e)
@@ -74,7 +76,14 @@ class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() 
 
     fun addPokemon(pokemon: Pokemon) {
         viewModelScope.launch {
-            repository.insertPokemon(pokemon)
+            val existingPokemon = getPokemonById(pokemon.id)
+            if (existingPokemon != null) {
+                repository.updatePokemon(pokemon)
+                Log.d("add","update ${pokemon.name}")
+            } else {
+                repository.insertPokemon(pokemon)
+                Log.d("add","insert ${pokemon.name}")
+            }
             refreshPokemonList() // Dopo l'inserimento, aggiorna la lista
         }
     }

@@ -23,7 +23,6 @@ data class PokemonDetail(
 @Serializable
 data class Sprites(
     val front_default: String?
-    // Altre immagini o sprite se necessario
 )
 
 @Serializable
@@ -35,3 +34,5 @@ data class Move(
 data class MoveName(
     val name: String
 )
+
+class BooleanWrapper(var value: Boolean)
