@@ -2,6 +2,7 @@
 
 package com.lrnzznn.pokedexrawfish
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -44,18 +45,23 @@ import androidx.compose.ui.layout.ContentScale
 
 
 @Composable
-fun PokemonInterface(viewModel: PokemonViewModel) {
+fun PokemonInterface(viewModel: PokemonViewModel, context: Context) {
 
     var isFirstLaunch by remember { mutableStateOf(true) }
 
     if (isFirstLaunch) {
         LaunchedEffect("load") {
-            try {
-                loadPokemon(viewModel)
-            } catch (e: Exception) {
-                Log.e("LaunchedEffect", "Error fetching and adding pokemons", e)
-            } finally {
-                isFirstLaunch = false
+            if(isInternetAvailable(context = context)){
+                viewModel.connection = true
+                try {
+                    loadPokemon(viewModel)
+                } catch (e: Exception) {
+                    Log.e("LaunchedEffect", "Error fetching and adding pokemons", e)
+                } finally {
+                    isFirstLaunch = false
+                }
+            }else{
+                Log.e("Connectivity", "No internet connection available")
             }
         }
     }
@@ -100,7 +106,9 @@ fun PokemonListScreen(viewModel: PokemonViewModel, onItemClick: (Pokemon) -> Uni
         SwipeRefresh(
             state = swipeRefreshState,
             onRefresh = {
-
+                swipeRefreshState.isRefreshing = true
+                if(viewModel.connection) loadPokemon(viewModel)
+                swipeRefreshState.isRefreshing = false
             }
         ) {
             LazyColumn(
@@ -121,34 +129,41 @@ fun NavigationButtons(viewModel: PokemonViewModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Button(
             onClick = { viewModel.loadPreviousPage() },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1E88E5)),
-            shape = RoundedCornerShape(50)
+            shape = RoundedCornerShape(50),
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 8.dp)
         ) {
             Text(
                 text = "<<",
                 color = Color.White,
-                style = MaterialTheme.typography.button.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.button.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold)
             )
         }
 
         Button(
             onClick = { viewModel.loadNextPage() },
             colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1E88E5)),
-            shape = RoundedCornerShape(50)
+            shape = RoundedCornerShape(50),
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 8.dp)
         ) {
             Text(
                 text = ">>",
                 color = Color.White,
-                style = MaterialTheme.typography.button.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                style = MaterialTheme.typography.button.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold)
             )
         }
     }
 }
+
 
 
 @Composable
@@ -195,7 +210,6 @@ fun PokemonItem(pokemon: Pokemon, onItemClick: (Pokemon) -> Unit) {
     }
 }
 
-
 @Composable
 fun PokemonDetailScreen(pokemon: Pokemon) {
     Column(
@@ -204,52 +218,84 @@ fun PokemonDetailScreen(pokemon: Pokemon) {
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
     ) {
-        Box(
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            elevation = 8.dp,
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(1f)
+                .padding(bottom = 16.dp)
         ) {
-            AsyncImage(
-                model = pokemon.images,
-                contentDescription = "Immagine di ${pokemon.name}",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Fit
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+            ) {
+                AsyncImage(
+                    model = pokemon.images,
+                    contentDescription = "Immagine di ${pokemon.name}",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
         }
+
+        Text(
+            text = pokemon.name.capitalize(),
+            style = MaterialTheme.typography.h4.copy(
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF6200EA)
+            )
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+
+        InfoRow(label = "ID:", info = pokemon.id.toString())
+        InfoRow(label = "Altezza:", info = "${pokemon.height * 0.1} m")
+        InfoRow(label = "Peso:", info = "${pokemon.weight * 0.1} kg")
+
         Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "Nome: ${pokemon.name}",
-            style = MaterialTheme.typography.h4,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "ID: ${pokemon.id}",
-            style = MaterialTheme.typography.body1,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Altezza: ${pokemon.height * 0.1.toFloat()} m",
-            style = MaterialTheme.typography.body1
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Peso: ${pokemon.weight * 0.1.toFloat()} kg",
-            style = MaterialTheme.typography.body1
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = "Mosse:",
-            style = MaterialTheme.typography.h6,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.h6.copy(
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF03DAC5)
+            )
         )
+        Spacer(modifier = Modifier.height(8.dp))
+
         pokemon.movesList.forEach { move ->
             Text(
-                text = "- ${move.move.name}",
-                style = MaterialTheme.typography.body1,
-                modifier = Modifier.padding(start = 16.dp)
+                text = "- ${move.move.name.capitalize()}",
+                style = MaterialTheme.typography.body1.copy(
+                    color = Color(0xFF000000)
+                ),
+                modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
             )
         }
+    }
+}
+
+@Composable
+fun InfoRow(label: String, info: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.body1.copy(
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF000000)
+            ),
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = info,
+            style = MaterialTheme.typography.body1.copy(
+                color = Color(0xFF000000)
+            ),
+            modifier = Modifier.weight(1f)
+        )
     }
 }

@@ -15,6 +15,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.serialization.json.Json
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 
 
 val client = HttpClient(CIO) {
@@ -62,10 +65,14 @@ suspend fun fetchPokemonDetails(urldetail : String) : PokemonDetail?{
 }
 
 fun loadPokemon(viewModel: PokemonViewModel){
+    if (!viewModel.loadSemaphore.tryAcquire()) {
+        Log.d("loadPokemon", "Another load operation is already in progress")
+        return
+    }
     viewModel.viewModelScope.launch(IO) {
         val data = fetchPokemons()
         if (data.isNotEmpty()) {
-            val concurrencyLimit = 25
+            val concurrencyLimit = 20
             val semaphore = Semaphore(concurrencyLimit)
             coroutineScope {
                 data.forEach { pokemon ->
@@ -103,6 +110,18 @@ fun loadPokemon(viewModel: PokemonViewModel){
         } else {
             Log.d("HTTP5", "Nessun dato disponibile")
         }
+    }
+}
+
+fun isInternetAvailable(context: Context): Boolean {
+    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val activeNetwork = connectivityManager.activeNetwork ?: return false
+    val networkCapabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+    return when {
+        networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+        networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+        networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+        else -> false
     }
 }
 
