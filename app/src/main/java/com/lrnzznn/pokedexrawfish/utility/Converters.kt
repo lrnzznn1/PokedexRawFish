@@ -1,4 +1,4 @@
-package com.lrnzznn.pokedexrawfish
+package com.lrnzznn.pokedexrawfish.utility
 
 import androidx.room.TypeConverter
 import kotlinx.serialization.encodeToString

@@ -1,12 +1,11 @@
-package com.lrnzznn.pokedexrawfish
+package com.lrnzznn.pokedexrawfish.dataBase
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 
-class PokemonRepository(private val pokemonDao: PokemonDao) {
 
-    val allPokemon: Flow<List<Pokemon>> = pokemonDao.getAllPokemon()
+// Repository class that serves as an abstraction layer for accessing Pokemon data.
+class PokemonRepository(private val pokemonDao: PokemonDao) {
 
     suspend fun insertPokemon(pokemon: Pokemon) {
         pokemonDao.insertPokemon(pokemon)
@@ -14,9 +13,7 @@ class PokemonRepository(private val pokemonDao: PokemonDao) {
     suspend fun updatePokemon(pokemon: Pokemon) {
         pokemonDao.updatePokemon(pokemon)
     }
-    fun getAllPokemon(){
-        pokemonDao.getAllPokemon()
-    }
+
     suspend fun deleteAllPokemon(){
         return pokemonDao.deleteAllPokemon()
     }

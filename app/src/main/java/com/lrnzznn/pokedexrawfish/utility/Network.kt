@@ -1,4 +1,4 @@
-package com.lrnzznn.pokedexrawfish
+package com.lrnzznn.pokedexrawfish.utility
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
@@ -18,57 +18,63 @@ import kotlinx.serialization.json.Json
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import com.lrnzznn.pokedexrawfish.dataBase.Pokemon
+import com.lrnzznn.pokedexrawfish.dataBase.PokemonViewModel
 
 
+// JSON configuration to ignore unknown keys
+private val json = Json {
+    ignoreUnknownKeys = true
+}
+
+// Initialize HttpClient with JSON serializer
 val client = HttpClient(CIO) {
     install(JsonFeature) {
         serializer = KotlinxSerializer()
     }
 }
 
+// Fetch list of Pokemon from the API
 suspend fun fetchPokemons(): List<PokemonJSON> {
     return try {
         val response: HttpResponse = client.get("https://pokeapi.co/api/v2/pokemon?limit=100000&offset=0")
         val jsonString = response.readText()
-        Log.d("HTTP1", jsonString)
 
-        val pokemonListResponse = Gson().fromJson<PokemonListResponse>(jsonString, object : TypeToken<PokemonListResponse>() {}.type)
+        val pokemonListResponse = Gson().fromJson<PokemonListResponse>(
+            jsonString, object : TypeToken<PokemonListResponse>() {}.type
+        )
         val pokemons = pokemonListResponse.results
-
-        Log.d("HTTP2", pokemons.toString())
 
         pokemons
     } catch (e: Exception) {
         Log.e("fetchPokemons", "Error fetching pokemons", e)
-
         emptyList()
     }
 }
 
-private val json = Json {
-    ignoreUnknownKeys = true // Ignora le chiavi sconosciute nel JSON
-}
-
+// Fetch details for a specific Pokemon
 suspend fun fetchPokemonDetails(urldetail : String) : PokemonDetail?{
     return try {
         val response: HttpResponse = client.get(urldetail)
         val jsonString = response.readText()
-        Log.d("JSON response", jsonString)
 
         val pokemonDetail = json.decodeFromString<PokemonDetail>(jsonString)
         Log.d("JSON", pokemonDetail.toString())
+
         pokemonDetail
     }catch (e: Exception){
-        Log.e("aaa", "Error fetching pokemon details", e)
+        Log.e("fetchPokemonDetails", "Error fetching pokemon details", e)
         null
     }
 }
 
+// Load Pokemon data into ViewModel
 fun loadPokemon(viewModel: PokemonViewModel){
     if (!viewModel.loadSemaphore.tryAcquire()) {
         Log.d("loadPokemon", "Another load operation is already in progress")
         return
     }
+
     viewModel.viewModelScope.launch(IO) {
         val data = fetchPokemons()
         if (data.isNotEmpty()) {
@@ -90,16 +96,13 @@ fun loadPokemon(viewModel: PokemonViewModel){
                                     name = pokemon.name,
                                     height = pokemonDetail.height,
                                     weight = pokemonDetail.weight,
-                                    images = pokemonDetail.sprites.front_default ?: "",
+                                    images = pokemonDetail.sprites.frontDefault ?: "",
                                     movesList = moves
                                 )
-                                Log.d("ssss", newPokemon.id.toString())
+                                Log.d("loadPokemon", newPokemon.id.toString())
                                 viewModel.addPokemon(newPokemon)
                             } else {
-                                Log.e(
-                                    "fetchPokemonDetails",
-                                    "Failed to fetch details for ${pokemon.name}"
-                                )
+                                Log.e("fetchPokemonDetails", "Failed to fetch details for ${pokemon.name}")
                             }
                         } finally {
                             semaphore.release()
@@ -108,11 +111,12 @@ fun loadPokemon(viewModel: PokemonViewModel){
                 }
             }
         } else {
-            Log.d("HTTP5", "Nessun dato disponibile")
+            Log.d("loadPokemon", "No data available")
         }
     }
 }
 
+// Check if internet is available
 fun isInternetAvailable(context: Context): Boolean {
     val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     val activeNetwork = connectivityManager.activeNetwork ?: return false

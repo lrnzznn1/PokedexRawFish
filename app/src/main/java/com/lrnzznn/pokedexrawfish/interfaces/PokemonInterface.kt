@@ -1,6 +1,6 @@
 @file:Suppress("DEPRECATION")
 
-package com.lrnzznn.pokedexrawfish
+package com.lrnzznn.pokedexrawfish.interfaces
 
 import android.content.Context
 import android.util.Log
@@ -42,8 +42,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.layout.ContentScale
+import com.lrnzznn.pokedexrawfish.dataBase.Pokemon
+import com.lrnzznn.pokedexrawfish.dataBase.PokemonViewModel
+import com.lrnzznn.pokedexrawfish.utility.isInternetAvailable
+import com.lrnzznn.pokedexrawfish.utility.loadPokemon
+import java.util.Locale
 
-
+// Composable function for the main entry point of the Pokemon interface.
 @Composable
 fun PokemonInterface(viewModel: PokemonViewModel, context: Context) {
 
@@ -70,7 +75,7 @@ fun PokemonInterface(viewModel: PokemonViewModel, context: Context) {
 }
 
 
-
+// Composable function representing the entire Pokemon application.
 @Composable
 fun PokemonApp(viewModel: PokemonViewModel) {
     val navController = rememberNavController()
@@ -95,7 +100,7 @@ fun PokemonApp(viewModel: PokemonViewModel) {
 }
 
 
-
+// Composable function for displaying the list of Pokemons.
 @Composable
 fun PokemonListScreen(viewModel: PokemonViewModel, onItemClick: (Pokemon) -> Unit) {
     val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = false)
@@ -124,6 +129,8 @@ fun PokemonListScreen(viewModel: PokemonViewModel, onItemClick: (Pokemon) -> Uni
     }
 }
 
+
+// Composable function for navigation buttons (Previous and Next) in the Pokemon list.
 @Composable
 fun NavigationButtons(viewModel: PokemonViewModel) {
     Row(
@@ -165,10 +172,9 @@ fun NavigationButtons(viewModel: PokemonViewModel) {
 }
 
 
-
+// Composable function for displaying each Pokemon item in the list.
 @Composable
 fun PokemonItem(pokemon: Pokemon, onItemClick: (Pokemon) -> Unit) {
-    Log.d("PokemonStamp", pokemon.id.toString())
     Card(
         modifier = Modifier
             .padding(8.dp)
@@ -210,6 +216,8 @@ fun PokemonItem(pokemon: Pokemon, onItemClick: (Pokemon) -> Unit) {
     }
 }
 
+
+// Composable function for displaying the details of a specific Pokemon.
 @Composable
 fun PokemonDetailScreen(pokemon: Pokemon) {
     Column(
@@ -240,7 +248,7 @@ fun PokemonDetailScreen(pokemon: Pokemon) {
         }
 
         Text(
-            text = pokemon.name.capitalize(),
+            text = pokemon.name.capitalize(Locale.ROOT),
             style = MaterialTheme.typography.h4.copy(
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF6200EA)
@@ -265,7 +273,7 @@ fun PokemonDetailScreen(pokemon: Pokemon) {
 
         pokemon.movesList.forEach { move ->
             Text(
-                text = "- ${move.move.name.capitalize()}",
+                text = "- ${move.move.name.capitalize(Locale.ROOT)}",
                 style = MaterialTheme.typography.body1.copy(
                     color = Color(0xFF000000)
                 ),
@@ -275,6 +283,8 @@ fun PokemonDetailScreen(pokemon: Pokemon) {
     }
 }
 
+
+// Composable function for displaying a row of information with a label and corresponding value.
 @Composable
 fun InfoRow(label: String, info: String) {
     Row(

@@ -1,4 +1,4 @@
-package com.lrnzznn.pokedexrawfish
+package com.lrnzznn.pokedexrawfish.dataBase
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
@@ -7,36 +7,41 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.State
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.sync.Semaphore
 
 class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() {
 
+    // CoroutineScope for managing coroutines in ViewModel
     private val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    var currentPage = 0
+    // Current page and page size for pagination
+    private var currentPage = 0
     private val pageSize = 20
 
+    // State for holding the list of Pokemon
     private val _pokemonListState = mutableStateOf<List<Pokemon>>(emptyList())
     val pokemonListState: State<List<Pokemon>> = _pokemonListState
 
+    // Semaphore to manage concurrent data loading operations
     val loadSemaphore = Semaphore(1)
 
+    // Flag to indicate network connectivity
     var connection : Boolean = false
 
+
+    // Initialization block to load initial data
     init {
         viewModelScope.launch {
-            loadMorePokemons(0, pageSize)
+            loadMorePokemons()
         }
     }
 
-    fun loadMorePokemons(offset: Int, limit: Int) {
+    // Method to load the initial set of Pokemon
+    private fun loadMorePokemons() {
         viewModelScope.launch {
             try {
-                val pokemons = repository.getPokemonInRange(offset, limit)
+                val pokemons = repository.getPokemonInRange(0, pageSize)
                 _pokemonListState.value = pokemons
             } catch (e: Exception) {
                 Log.e("PokemonViewModel", "Error loading Pokémon", e)
@@ -44,9 +49,9 @@ class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() 
         }
     }
 
+    // Method to load the next page of Pokemon
     fun loadNextPage() {
         viewModelScope.launch {
-            Log.d("test1314","next")
             try {
                 currentPage++
                 val offset = currentPage * pageSize
@@ -61,9 +66,9 @@ class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() 
         }
     }
 
+    // Method to load the previous page of Pokemon
     fun loadPreviousPage() {
         viewModelScope.launch {
-            Log.d("test1314","previus")
             try {
                 if (currentPage > 0) {
                     currentPage--
@@ -78,32 +83,37 @@ class PokemonViewModel(private val repository: PokemonRepository) : ViewModel() 
         }
     }
 
+    // Method to add a new Pokemon to the database
     fun addPokemon(pokemon: Pokemon) {
         viewModelScope.launch {
             val existingPokemon = getPokemonById(pokemon.id)
             if (existingPokemon != null) {
                 repository.updatePokemon(pokemon)
-                Log.d("add","update ${pokemon.name}")
+                Log.d("addPokemon","update ${pokemon.name}")
             } else {
                 repository.insertPokemon(pokemon)
-                Log.d("add","insert ${pokemon.name}")
+                Log.d("addPokemon","insert ${pokemon.name}")
             }
-            refreshPokemonList() // Dopo l'inserimento, aggiorna la lista
+            refreshPokemonList() // Refresh the list after insertion/update
         }
     }
 
+    // Method to delete all Pokemon from the database
     fun deleteAllPokemon() {
         viewModelScope.launch {
             repository.deleteAllPokemon()
-            refreshPokemonList() // Dopo l'inserimento, aggiorna la lista
+            refreshPokemonList() // Refresh the list after deletion
         }
     }
+
+    // Helper method to refresh the list of Pokemon
     private suspend fun refreshPokemonList() {
         val offset = currentPage * pageSize
         val pokemons = repository.getPokemonInRange(offset, pageSize)
         _pokemonListState.value = pokemons
     }
 
+    // Method to get a Pokemon by its ID
     fun getPokemonById(id: Int?): Pokemon? {
         return pokemonListState.value.find { it.id == id }
     }

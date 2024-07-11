@@ -1,10 +1,13 @@
-package com.lrnzznn.pokedexrawfish
+package com.lrnzznn.pokedexrawfish.dataBase
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.lrnzznn.pokedexrawfish.utility.Move
 import kotlinx.serialization.Serializable
 
-@Suppress("PLUGIN_IS_NOT_ENABLED")
+
+// Data class representing a Pokemon entity stored in the database.
+@Suppress("PLUGIN_IS_NOT_ENABLED") //Suppress IDE warning about plugin not enabled for Serializable
 @Serializable
 @Entity(tableName = "pokemon_table")
 data class Pokemon(
